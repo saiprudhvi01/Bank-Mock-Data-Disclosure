@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Comparison - Bank User Disclosure System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 30px auto;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .comparison-section {
+            padding: 40px 30px;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 15px 0;
+        }
+        .metric-label {
+            font-size: 1.1rem;
+            color: #666;
+            font-weight: 600;
+        }
+        .model-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .chart-item {
+            flex: 1;
+            min-height: 400px;
+        }
+        .chart-item canvas {
+            max-height: 350px !important;
+        }
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        .comparison-table {
+            margin-bottom: 0;
+        }
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: center;
+            font-weight: 500;
+        }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        .best-metric {
+            background: #d4edda;
+            color: #155724;
+            font-weight: 700;
+        }
+        .btn-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        .insights-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+        .insights-box h5 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .model-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .row-equal {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .row-equal > div {
+            display: flex;
+            flex: 1 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <!-- Header Section -->
+            <div class="header-section">
+                <h1><i class="fas fa-chart-bar me-2"></i>Model Performance Comparison</h1>
+                <p>Comprehensive analysis of prediction model performance metrics</p>
+            </div>
+
+            <!-- Comparison Section -->
+            <div class="comparison-section">
+                <!-- Key Insights -->
+                <div class="insights-box">
+                    <h5><i class="fas fa-lightbulb me-2"></i>Key Insights</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li><strong>Rule-Based System:</strong> Provides transparent explanations with interpretable logic</li>
+                                <li><strong>Random Forest:</strong> Ensemble method combining multiple decision trees</li>
+                                <li><strong>SVM:</strong> Kernel-based method finding optimal decision boundaries</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul>
+                                <li>Higher <strong>ROC-AUC</strong> indicates better overall discrimination ability</li>
+                                <li><strong>Precision</strong> measures accuracy of positive predictions</li>
+                                <li><strong>Recall</strong> measures ability to identify all positive cases</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics Overview -->
+                <div class="row row-equal mb-4">
+                    {% set models = results.keys() %}
+                    {% for model_name in models %}
+                    <div class="col-lg-4">
+                        <div class="metric-card">
+                            {% if model_name == 'rule_based' %}
+                                <div class="model-icon"><i class="fas fa-gavel"></i></div>
+                                <div class="model-name">Rule-Based System</div>
+                            {% elif model_name == 'random_forest' %}
+                                <div class="model-icon"><i class="fas fa-tree"></i></div>
+                                <div class="model-name">Random Forest</div>
+                            {% elif model_name == 'svm' %}
+                                <div class="model-icon"><i class="fas fa-project-diagram"></i></div>
+                                <div class="model-name">Support Vector Machine</div>
+                            {% endif %}
+                            
+                            <div class="metric-value">{{ "%.3f"|format(results[model_name].roc_auc) }}</div>
+                            <div class="metric-label">ROC-AUC Score</div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-4">
+                                    <small class="text-muted">Accuracy</small><br>
+                                    <strong>{{ "%.3f"|format(results[model_name].accuracy) }}</strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted">Precision</small><br>
+                                    <strong>{{ "%.3f"|format(results[model_name].precision) }}</strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted">Recall</small><br>
+                                    <strong>{{ "%.3f"|format(results[model_name].recall) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Performance Charts -->
+                <div class="chart-row">
+                    <div class="chart-item">
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-radar me-2"></i>Overall Performance Radar</h4>
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-item">
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-bar me-2"></i>Metrics Comparison</h4>
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-item">
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-line me-2"></i>ROC-AUC Performance</h4>
+                            <canvas id="rocChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-item">
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-pie me-2"></i>Accuracy Distribution</h4>
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-item">
+                    <div class="chart-container">
+                        <h4><i class="fas fa-chart-area me-2"></i>Comprehensive Metrics Overview</h4>
+                        <canvas id="areaChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Comparison Table -->
+                <div class="table-container">
+                    <h4 class="p-3"><i class="fas fa-table me-2"></i>Detailed Performance Metrics</h4>
+                    <div class="table-responsive">
+                        <table class="table comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Accuracy</th>
+                                    <th>Precision</th>
+                                    <th>Recall</th>
+                                    <th>ROC-AUC</th>
+                                    <th>Best Metric</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set best_accuracy = results.values() | map(attribute='accuracy') | max %}
+                                {% set best_precision = results.values() | map(attribute='precision') | max %}
+                                {% set best_recall = results.values() | map(attribute='recall') | max %}
+                                {% set best_roc_auc = results.values() | map(attribute='roc_auc') | max %}
+                                
+                                {% for model_name, metrics in results.items() %}
+                                <tr>
+                                    <td>
+                                        {% if model_name == 'rule_based' %}
+                                            <strong><i class="fas fa-gavel me-2"></i>Rule-Based</strong>
+                                        {% elif model_name == 'random_forest' %}
+                                            <strong><i class="fas fa-tree me-2"></i>Random Forest</strong>
+                                        {% elif model_name == 'svm' %}
+                                            <strong><i class="fas fa-project-diagram me-2"></i>SVM</strong>
+                                        {% endif %}
+                                    </td>
+                                    <td {% if metrics.accuracy == best_accuracy %}class="best-metric"{% endif %}>
+                                        {{ "%.4f"|format(metrics.accuracy) }}
+                                    </td>
+                                    <td {% if metrics.precision == best_precision %}class="best-metric"{% endif %}>
+                                        {{ "%.4f"|format(metrics.precision) }}
+                                    </td>
+                                    <td {% if metrics.recall == best_recall %}class="best-metric"{% endif %}>
+                                        {{ "%.4f"|format(metrics.recall) }}
+                                    </td>
+                                    <td {% if metrics.roc_auc == best_roc_auc %}class="best-metric"{% endif %}>
+                                        {{ "%.4f"|format(metrics.roc_auc) }}
+                                    </td>
+                                    <td>
+                                        {% if metrics.accuracy == best_accuracy %}Accuracy {% endif %}
+                                        {% if metrics.precision == best_precision %}Precision {% endif %}
+                                        {% if metrics.recall == best_recall %}Recall {% endif %}
+                                        {% if metrics.roc_auc == best_roc_auc %}ROC-AUC{% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Classification Reports -->
+                <div class="row mt-4">
+                    {% for model_name, metrics in results.items() %}
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5>
+                                {% if model_name == 'rule_based' %}
+                                    <i class="fas fa-gavel me-2"></i>Rule-Based Report
+                                {% elif model_name == 'random_forest' %}
+                                    <i class="fas fa-tree me-2"></i>Random Forest Report
+                                {% elif model_name == 'svm' %}
+                                    <i class="fas fa-project-diagram me-2"></i>SVM Report
+                                {% endif %}
+                            </h5>
+                            <pre class="bg-light p-3 rounded" style="font-size: 0.85rem;">{{ metrics.classification_report }}</pre>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-center mt-5">
+                    <a href="/" class="btn btn-back me-3">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Prediction
+                    </a>
+                    <a href="/health" class="btn btn-outline-primary" target="_blank">
+                        <i class="fas fa-heartbeat me-2"></i>System Health
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data passed from Flask template - generated server-side
+        var chartDataString = '{{ chart_data|safe }}';
+        var chartData = JSON.parse(chartDataString);
+        
+        // Prepare arrays for Chart.js
+        const modelNames = [];
+        const accuracyData = [];
+        const precisionData = [];
+        const recallData = [];
+        const rocAucData = [];
+
+        // Populate arrays from chartData
+        Object.keys(chartData).forEach(key => {
+            const data = chartData[key];
+            modelNames.push(data.name);
+            accuracyData.push(data.accuracy);
+            precisionData.push(data.precision);
+            recallData.push(data.recall);
+            rocAucData.push(data.roc_auc);
+        });
+
+        // Create Radar Chart
+        const radarCtx = document.getElementById('radarChart').getContext('2d');
+        const radarChart = new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: modelNames,
+                datasets: [
+                    {
+                        label: 'Accuracy',
+                        data: accuracyData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
+                    },
+                    {
+                        label: 'Precision',
+                        data: precisionData,
+                        backgroundColor: 'rgba(118, 75, 162, 0.2)',
+                        borderColor: 'rgba(118, 75, 162, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(118, 75, 162, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(118, 75, 162, 1)'
+                    },
+                    {
+                        label: 'Recall',
+                        data: recallData,
+                        backgroundColor: 'rgba(240, 147, 251, 0.2)',
+                        borderColor: 'rgba(240, 147, 251, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(240, 147, 251, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(240, 147, 251, 1)'
+                    },
+                    {
+                        label: 'ROC-AUC',
+                        data: rocAucData,
+                        backgroundColor: 'rgba(67, 233, 123, 0.2)',
+                        borderColor: 'rgba(67, 233, 123, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(67, 233, 123, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(67, 233, 123, 1)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 1,
+                        ticks: {
+                            stepSize: 0.2
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Create Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        const barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: modelNames,
+                datasets: [
+                    {
+                        label: 'Accuracy',
+                        data: accuracyData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Precision',
+                        data: precisionData,
+                        backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                        borderColor: 'rgba(118, 75, 162, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Recall',
+                        data: recallData,
+                        backgroundColor: 'rgba(240, 147, 251, 0.8)',
+                        borderColor: 'rgba(240, 147, 251, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'ROC-AUC',
+                        data: rocAucData,
+                        backgroundColor: 'rgba(67, 233, 123, 0.8)',
+                        borderColor: 'rgba(67, 233, 123, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        ticks: {
+                            stepSize: 0.1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Create ROC-AUC Line Chart
+        const rocCtx = document.getElementById('rocChart').getContext('2d');
+        const rocChart = new Chart(rocCtx, {
+            type: 'line',
+            data: {
+                labels: modelNames,
+                datasets: [{
+                    label: 'ROC-AUC Score',
+                    data: rocAucData,
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0.5,
+                        max: 1,
+                        ticks: {
+                            stepSize: 0.1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Create Pie Chart for Accuracy
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: modelNames,
+                datasets: [{
+                    data: accuracyData,
+                    backgroundColor: [
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(118, 75, 162, 0.8)',
+                        'rgba(240, 147, 251, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(102, 126, 234, 1)',
+                        'rgba(118, 75, 162, 1)',
+                        'rgba(240, 147, 251, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + (context.parsed * 100).toFixed(1) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Create Area Chart
+        const areaCtx = document.getElementById('areaChart').getContext('2d');
+        const areaChart = new Chart(areaCtx, {
+            type: 'line',
+            data: {
+                labels: modelNames,
+                datasets: [
+                    {
+                        label: 'Accuracy',
+                        data: accuracyData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.3)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Precision',
+                        data: precisionData,
+                        backgroundColor: 'rgba(118, 75, 162, 0.3)',
+                        borderColor: 'rgba(118, 75, 162, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Recall',
+                        data: recallData,
+                        backgroundColor: 'rgba(240, 147, 251, 0.3)',
+                        borderColor: 'rgba(240, 147, 251, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'ROC-AUC',
+                        data: rocAucData,
+                        backgroundColor: 'rgba(67, 233, 123, 0.3)',
+                        borderColor: 'rgba(67, 233, 123, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        ticks: {
+                            stepSize: 0.2
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

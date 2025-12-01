@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results - Bank User Disclosure System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 30px auto;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .results-section {
+            padding: 40px 30px;
+        }
+        .prediction-card {
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        .prediction-card:hover {
+            transform: translateY(-5px);
+        }
+        .rule-based-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .rf-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .svm-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        .prediction-badge {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .risk-high {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        .risk-low {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        .probability-bar {
+            height: 30px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .probability-fill {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            transition: width 1s ease;
+        }
+        .explanation-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .comparison-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .input-summary {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .btn-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        .model-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .rule-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 5px 0;
+            font-size: 0.85rem;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .prediction-card {
+            animation: slideIn 0.6s ease-out;
+        }
+        .rf-card {
+            animation-delay: 0.2s;
+        }
+        .svm-card {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <!-- Header Section -->
+            <div class="header-section">
+                <h1><i class="fas fa-chart-line me-2"></i>Prediction Results</h1>
+                <p>Comprehensive analysis using multiple prediction models</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <!-- Input Summary -->
+                <div class="input-summary">
+                    <h5><i class="fas fa-user me-2"></i>User Information</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Age:</strong> {{ results.input_data.age }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Balance:</strong> ${{ "%.2f"|format(results.input_data.balance|float) }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Tenure:</strong> {{ results.input_data.tenure }} months
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Products:</strong> {{ results.input_data.num_products }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Credit Score:</strong> {{ results.input_data.credit_score }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Salary:</strong> ${{ "%.2f"|format(results.input_data.estimated_salary|float) }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Phone:</strong> {% if results.input_data.has_phone == '1' %}Registered{% else %}Not Registered{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Status:</strong> {% if results.input_data.is_active_member == '1' %}Active{% else %}Inactive{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Credit Card:</strong> {% if results.input_data.has_credit_card == '1' %}Yes{% else %}No{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Loan:</strong> {% if results.input_data.has_loan == '1' %}Active{% else %}None{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rule-Based Prediction Only -->
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="prediction-card rule-based-card">
+                            <div class="prediction-badge {% if results.rule_based.prediction == 1 %}risk-high{% else %}risk-low{% endif %}">
+                                {% if results.rule_based.prediction == 1 %}
+                                    <i class="fas fa-exclamation-triangle me-2"></i>HIGH DISCLOSURE RISK
+                                {% else %}
+                                    <i class="fas fa-check-circle me-2"></i>LOW DISCLOSURE RISK
+                                {% endif %}
+                            </div>
+                            
+                            <div class="metric-value">{{ "%.1f"|format(results.rule_based.probability * 100) }}%</div>
+                            <div class="metric-label">Risk Probability</div>
+                            
+                            <div class="probability-bar">
+                                <div class="probability-fill rule-prob-fill" data-width="{{ results.rule_based.probability * 100 }}"></div>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <strong>Score: {{ "%.1f"|format(results.rule_based.score) }}/7.0</strong><br>
+                                <small>{{ results.rule_based.explanation.replace('\n', '<br>')|safe }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-center mt-5">
+                    <a href="/" class="btn btn-back">
+                        <i class="fas fa-arrow-left me-2"></i>New Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set probability bar widths from data attributes
+        document.querySelectorAll('.probability-fill').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            bar.style.width = width + '%';
+        });
+
+        // Animate probability bars on page load
+        window.addEventListener('load', function() {
+            const probabilityFills = document.querySelectorAll('.probability-fill');
+            probabilityFills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

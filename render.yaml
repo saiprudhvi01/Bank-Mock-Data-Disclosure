@@ -1,0 +1,17 @@
+services:
+  # Web Service
+  - type: web
+    name: bank-disclosure-prediction
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python train.py"
+    startCommand: "python app.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
+      - key: FLASK_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    healthCheckPath: /health
+    autoDeploy: true

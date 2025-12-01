@@ -1,0 +1,24 @@
+# Core Machine Learning Libraries
+numpy==2.1.0
+pandas==2.3.0
+scikit-learn==1.5.2
+joblib==1.3.2
+
+# Web Framework
+Flask==3.0.0
+Werkzeug==3.0.3
+Jinja2==3.1.4
+
+# Data Visualization (optional for development)
+matplotlib==3.9.0
+seaborn==0.13.2
+
+# Development and Testing
+pytest==8.2.0
+pytest-flask==1.3.0
+
+# Production Server (optional)
+gunicorn==21.2.0
+
+# Data Processing
+openpyxl==3.1.2

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank User Disclosure Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 30px auto;
+            max-width: 800px;
+            overflow: hidden;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .header-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .form-section {
+            padding: 40px 30px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .form-control, .form-select {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-predict {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .info-card h5 {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .model-info {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .model-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+        .model-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .model-item h6 {
+            font-weight: 600;
+            color: #333;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <!-- Header Section -->
+            <div class="header-section">
+                <h1><i class="fas fa-shield-alt me-2"></i>Bank User Disclosure Prediction</h1>
+                <p>Advanced ML System with Rule-Based Analysis</p>
+            </div>
+
+            <!-- Form Section -->
+            <div class="form-section">
+                <div class="info-card">
+                    <h5><i class="fas fa-info-circle me-2"></i>How it works</h5>
+                    <p class="mb-0">Enter user information below to predict disclosure likelihood using three different approaches:
+                    Rule-Based System, Random Forest, and Support Vector Machine. Compare results and get detailed explanations.</p>
+                </div>
+
+                <form method="POST" action="/predict" id="predictionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" name="age" min="18" max="80" value="35" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="balance" class="form-label">Account Balance ($)</label>
+                            <input type="number" class="form-control" id="balance" name="balance" min="0" max="100000" step="0.01" value="15000.00" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tenure" class="form-label">Account Tenure (months)</label>
+                            <input type="number" class="form-control" id="tenure" name="tenure" min="1" max="120" value="24" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="num_products" class="form-label">Number of Products</label>
+                            <select class="form-select" id="num_products" name="num_products" required>
+                                <option value="1">1 Product</option>
+                                <option value="2" selected>2 Products</option>
+                                <option value="3">3 Products</option>
+                                <option value="4">4 Products</option>
+                                <option value="5">5 Products</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="credit_score" class="form-label">Credit Score</label>
+                            <input type="number" class="form-control" id="credit_score" name="credit_score" min="300" max="850" value="650" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="estimated_salary" class="form-label">Estimated Annual Salary ($)</label>
+                            <input type="number" class="form-control" id="estimated_salary" name="estimated_salary" min="20000" max="200000" step="0.01" value="60000.00" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="has_phone" class="form-label">Phone Number Registered</label>
+                            <select class="form-select" id="has_phone" name="has_phone" required>
+                                <option value="1" selected>Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="is_active_member" class="form-label">Active Member Status</label>
+                            <select class="form-select" id="is_active_member" name="is_active_member" required>
+                                <option value="1" selected>Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="has_credit_card" class="form-label">Has Credit Card</label>
+                            <select class="form-select" id="has_credit_card" name="has_credit_card" required>
+                                <option value="1" selected>Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="has_loan" class="form-label">Has Active Loan</label>
+                            <select class="form-select" id="has_loan" name="has_loan" required>
+                                <option value="0" selected>No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-predict">
+                        <i class="fas fa-brain me-2"></i>Predict Disclosure Risk
+                    </button>
+                </form>
+
+                <!-- Model Information -->
+                <div class="model-info">
+                    <div class="model-item">
+                        <i class="fas fa-gavel"></i>
+                        <h6>Rule-Based</h6>
+                        <small class="text-muted">Transparent logic with explanations</small>
+                    </div>
+                    <div class="model-item">
+                        <i class="fas fa-tree"></i>
+                        <h6>Random Forest</h6>
+                        <small class="text-muted">Ensemble decision trees</small>
+                    </div>
+                    <div class="model-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <h6>SVM</h6>
+                        <small class="text-muted">Support Vector Machine</small>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="/model_comparison" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-bar me-2"></i>View Model Comparison
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            const form = e.target;
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+
+        // Add input formatting
+        document.getElementById('balance').addEventListener('blur', function() {
+            this.value = parseFloat(this.value).toFixed(2);
+        });
+
+        document.getElementById('estimated_salary').addEventListener('blur', function() {
+            this.value = parseFloat(this.value).toFixed(2);
+        });
+    </script>
+</body>
+</html>
