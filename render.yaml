@@ -15,3 +15,7 @@ services:
         value: 10000
     healthCheckPath: /health
     autoDeploy: true
+    disk:
+      name: models-disk
+      mountPath: /app/models
+      sizeGB: 1
