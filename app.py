@@ -64,33 +64,57 @@ def prepare_input_data(form_data):
     
     return input_scaled, input_array
 
-def make_ml_predictions(input_scaled):
+def make_ml_predictions(form_data):
     """Make predictions using ML models."""
     predictions = {}
     
-    # Try Random Forest
-    if 'random_forest' in models and models['random_forest'] is not None:
-        try:
-            rf_pred = models['random_forest'].predict(input_scaled)[0]
-            rf_proba = models['random_forest'].predict_proba(input_scaled)[0][1]
-            predictions['random_forest'] = {
-                'prediction': int(rf_pred),
-                'probability': float(rf_proba)
-            }
-        except:
-            pass  # Silently fail if model doesn't work
+    # Only try ML predictions if models and scaler are available
+    if scaler is None or len(models) == 0:
+        return predictions  # Return empty dict if models not loaded
     
-    # Try SVM
-    if 'svm' in models and models['svm'] is not None:
-        try:
-            svm_pred = models['svm'].predict(input_scaled)[0]
-            svm_proba = models['svm'].predict_proba(input_scaled)[0][1]
-            predictions['svm'] = {
-                'prediction': int(svm_pred),
-                'probability': float(svm_proba)
-            }
-        except:
-            pass  # Silently fail if model doesn't work
+    # Convert form data to numpy array
+    try:
+        input_array = np.array([
+            float(form_data['age']),
+            float(form_data['balance']),
+            float(form_data['tenure']),
+            float(form_data['num_products']),
+            float(form_data['credit_score']),
+            float(form_data['has_phone']),
+            float(form_data['is_active_member']),
+            float(form_data['estimated_salary']),
+            float(form_data['has_credit_card']),
+            float(form_data['has_loan'])
+        ]).reshape(1, -1)
+        
+        # Scale the input
+        input_scaled = scaler.transform(input_array)
+        
+        # Try Random Forest
+        if 'random_forest' in models and models['random_forest'] is not None:
+            try:
+                rf_pred = models['random_forest'].predict(input_scaled)[0]
+                rf_proba = models['random_forest'].predict_proba(input_scaled)[0][1]
+                predictions['random_forest'] = {
+                    'prediction': int(rf_pred),
+                    'probability': float(rf_proba)
+                }
+            except:
+                pass  # Silently fail if model doesn't work
+        
+        # Try SVM
+        if 'svm' in models and models['svm'] is not None:
+            try:
+                svm_pred = models['svm'].predict(input_scaled)[0]
+                svm_proba = models['svm'].predict_proba(input_scaled)[0][1]
+                predictions['svm'] = {
+                    'prediction': int(svm_pred),
+                    'probability': float(svm_proba)
+                }
+            except:
+                pass  # Silently fail if model doesn't work
+    except:
+        pass  # Silently fail if anything goes wrong
     
     return predictions
 
@@ -147,11 +171,8 @@ def predict():
             if field not in form_data or not form_data[field]:
                 return jsonify({'error': f'Missing required field: {field}'}), 400
         
-        # Prepare input data
-        input_scaled, input_original = prepare_input_data(form_data)
-        
         # Make predictions
-        ml_predictions = make_ml_predictions(input_scaled)
+        ml_predictions = make_ml_predictions(form_data)
         rule_prediction = make_rule_based_prediction(form_data)
         
         # Prepare comparison table (use dummy data if evaluation results not available)
@@ -197,18 +218,15 @@ def api_predict():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
-        # Prepare input data
-        input_scaled, input_original = prepare_input_data(data)
-        
         # Make predictions
-        ml_predictions = make_ml_predictions(input_scaled)
+        ml_predictions = make_ml_predictions(data)
         rule_prediction = make_rule_based_prediction(data)
         
         # Return JSON response
         return jsonify({
             'rule_based': rule_prediction,
-            'random_forest': ml_predictions['random_forest'],
-            'svm': ml_predictions['svm']
+            'random_forest': ml_predictions.get('random_forest', {'prediction': 0, 'probability': 0.5}),
+            'svm': ml_predictions.get('svm', {'prediction': 0, 'probability': 0.5})
         })
         
     except Exception as e:
