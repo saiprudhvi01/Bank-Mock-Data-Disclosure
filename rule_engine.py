@@ -73,8 +73,10 @@ class RuleBasedPredictor:
         Returns:
             dict: Prediction with probability and explanation
         """
-        score = 0
+        score = 0.0
         triggered_rules = []
+        
+        print(f"DEBUG: Processing user data: {user_data}")
         
         # Apply each rule
         for feature, rule in self.rules.items():
@@ -107,9 +109,13 @@ class RuleBasedPredictor:
                     'weight': rule['weight'],
                     'reason': rule['reason']
                 })
+                print(f"DEBUG: Rule triggered - {feature}: {value} vs {threshold} (+{rule['weight']})")
+        
+        print(f"DEBUG: Final score: {score}")
         
         # Convert score to probability
         probability = self._score_to_probability(score)
+        print(f"DEBUG: Probability: {probability}")
         
         # Make binary prediction
         will_disclose = score >= self.prediction_threshold
@@ -140,7 +146,7 @@ class RuleBasedPredictor:
     
     def _score_to_probability(self, score):
         """
-        Convert rule score to probability using sigmoid function.
+        Convert rule score to probability using linear scaling.
         
         Args:
             score (float): Rule-based score
@@ -148,12 +154,21 @@ class RuleBasedPredictor:
         Returns:
             float: Probability (0-1)
         """
-        # Use sigmoid function to convert score to probability
-        # Shift and scale to get reasonable probability range
-        import math
-        adjusted_score = (score - self.prediction_threshold) * 2
-        probability = 1 / (1 + math.exp(-adjusted_score))
-        return max(0.01, min(0.99, probability))  # Clip to avoid extreme values
+        # Simple linear scaling for more predictable results
+        max_score = 9.0  # Maximum possible score
+        min_score = 0.0  # Minimum possible score
+        
+        # Linear scaling from score to probability
+        if score <= self.prediction_threshold:
+            # Below threshold: probability from 0.1 to 0.5
+            probability = 0.1 + (score / self.prediction_threshold) * 0.4
+        else:
+            # Above threshold: probability from 0.5 to 0.95
+            remaining_score = max_score - self.prediction_threshold
+            score_above_threshold = score - self.prediction_threshold
+            probability = 0.5 + (score_above_threshold / remaining_score) * 0.45
+        
+        return max(0.05, min(0.95, probability))
     
     def _generate_explanation(self, triggered_rules, score, will_disclose):
         """
