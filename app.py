@@ -42,6 +42,9 @@ def load_models():
 
 def prepare_input_data(form_data):
     """Prepare input data for prediction."""
+    if scaler is None:
+        raise ValueError("Scaler not loaded. Models may not be trained yet.")
+    
     # Convert form data to numpy array
     input_array = np.array([
         float(form_data['age']),
@@ -79,6 +82,9 @@ def make_ml_predictions(input_scaled):
 
 def make_rule_based_prediction(form_data):
     """Make prediction using rule-based system."""
+    if rule_predictor is None:
+        raise ValueError("Rule predictor not loaded. Models may not be trained yet.")
+    
     # Convert form data to dictionary
     user_data = {
         'age': float(form_data['age']),
@@ -223,10 +229,15 @@ def model_comparison():
 @app.route('/health')
 def health_check():
     """Health check endpoint."""
+    models_loaded = len(models) > 0
+    scaler_loaded = scaler is not None
+    rule_predictor_ready = rule_predictor is not None
+    
     return jsonify({
-        'status': 'healthy',
-        'models_loaded': len(models) > 0,
-        'rule_predictor_ready': rule_predictor is not None
+        'status': 'healthy' if models_loaded and scaler_loaded and rule_predictor_ready else 'unhealthy',
+        'models_loaded': models_loaded,
+        'scaler_loaded': scaler_loaded,
+        'rule_predictor_ready': rule_predictor_ready
     })
 
 if __name__ == '__main__':
@@ -238,3 +249,4 @@ if __name__ == '__main__':
         app.run(debug=False, host='0.0.0.0', port=port)
     else:
         print("Failed to load models. Please run train.py first to train and save models.")
+        exit(1)
