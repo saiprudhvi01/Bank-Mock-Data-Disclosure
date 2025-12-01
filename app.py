@@ -120,9 +120,10 @@ def make_ml_predictions(form_data):
 
 def make_rule_based_prediction(form_data):
     """Make prediction using rule-based system."""
+    global rule_predictor
+    
     # Always initialize rule predictor if not available
     if rule_predictor is None:
-        global rule_predictor
         rule_predictor = RuleBasedPredictor()
     
     # Convert form data to dictionary
