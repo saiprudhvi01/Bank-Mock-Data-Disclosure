@@ -59,11 +59,11 @@
             display: inline-block;
             margin: 10px 0;
         }
-        .risk-high {
+        .fake-high {
             background: rgba(255, 255, 255, 0.3);
             color: white;
         }
-        .risk-low {
+        .fake-low {
             background: rgba(255, 255, 255, 0.3);
             color: white;
         }
@@ -217,16 +217,16 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-6">
                         <div class="prediction-card rule-based-card">
-                            <div class="prediction-badge {% if results.rule_based.prediction == 1 %}risk-high{% else %}risk-low{% endif %}">
+                            <div class="prediction-badge {% if results.rule_based.prediction == 1 %}fake-high{% else %}fake-low{% endif %}">
                                 {% if results.rule_based.prediction == 1 %}
-                                    <i class="fas fa-exclamation-triangle me-2"></i>HIGH DISCLOSURE RISK
+                                    <i class="fas fa-exclamation-triangle me-2"></i>HIGH DISCLOSURE FAKE
                                 {% else %}
-                                    <i class="fas fa-check-circle me-2"></i>LOW DISCLOSURE RISK
+                                    <i class="fas fa-check-circle me-2"></i>LOW DISCLOSURE FAKE
                                 {% endif %}
                             </div>
                             
                             <div class="metric-value">{{ "%.1f"|format(results.rule_based.probability * 100) }}%</div>
-                            <div class="metric-label">Risk Probability</div>
+                            <div class="metric-label">Fake Probability</div>
                             
                             <div class="probability-bar">
                                 <div class="probability-fill rule-prob-fill" data-width="{{ results.rule_based.probability * 100 }}"></div>
